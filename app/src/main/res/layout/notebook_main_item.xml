@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="5dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:elevation="10dp"
+    android:orientation="vertical"
+    android:padding="10dp"
+    app:layout_constraintDimensionRatio="2:1">
+
+    <ImageView
+        android:padding="10dp"
+        android:id="@+id/ivNBDisplayItem"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/custom_image_background"
+        android:src="@drawable/laptop9"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/guideline2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvNameNBDisplayItem"
+        style="@style/TextAppearance.MaterialComponents.Subtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Product Name"
+        app:layout_constraintStart_toStartOf="@id/ivNBDisplayItem"
+        app:layout_constraintTop_toBottomOf="@id/ivNBDisplayItem" />
+
+    <TextView
+        android:id="@+id/tvPriceNBDisplayItem"
+        style="@style/TextAppearance.MaterialComponents.Subtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/tvNameNBDisplayItem"
+        app:layout_constraintTop_toBottomOf="@id/tvNameNBDisplayItem"
+        android:text="10000" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="1" />
+
+    <ToggleButton
+        android:id="@+id/btnLike"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:minHeight="48dp"
+        android:minWidth="48dp"
+        app:layout_constraintEnd_toStartOf="@id/guideline2"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textOn=""
+        android:textOff=""
+        android:background="@drawable/img_favorite_24"
+        android:backgroundTint="@color/white"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="3dp"
+        app:tint="@color/white" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
