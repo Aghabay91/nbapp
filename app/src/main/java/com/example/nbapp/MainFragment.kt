@@ -23,7 +23,8 @@ import com.google.firebase.database.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterface, LikeOnClickInterface {
+class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterface,
+    LikeOnClickInterface {
 
     private lateinit var binding: FragmentMainBinding
     private lateinit var databaseReference: DatabaseReference
@@ -38,14 +39,25 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+//        FirebaseDatabase.getInstance().getReference("products").setValue("MyTest")
+//            .addOnSuccessListener {
+//                Log.d("MyTagHere", "onViewCreated: Success")
+//            }.addOnFailureListener {
+//            Log.d("MyTagHere", "onViewCreated: ${it.message}")
+//        }
+//        FirebaseDatabase.getInstance("https://nbapp-e09bc-default-rtdb.europe-west1.firebasedatabase.app/")
+//            .getReference("products").setValue("").addOnSuccessListener {
+//            Log.d("MyTagHere", "onViewCreated: Success")
+//        }.addOnFailureListener {
+//            Log.d("MyTagHere", "onViewCreated: ${it.message}")
+//        }
 //        val databaseReference = FirebaseDatabase.getInstance().getReference("products")
 //
 //                                                  databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -73,9 +85,14 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
 //            }
 //        })
 
-        val databaseReference = FirebaseDatabase.getInstance().getReference("products")
-
-        databaseReference.child("p1").addListenerForSingleValueEvent(object : ValueEventListener {
+        val databaseReference = FirebaseDatabase.getInstance("https://nbapp-e09bc-default-rtdb.europe-west1.firebasedatabase.app/").getReference("products")
+        Log.d("TAG5", "Example")
+        databaseReference.child("imageUrl").setValue("https://firebasestorage.googleapis.com/v0/b/nbapp-e09bc.appspot.com/onb_asus.jpg?alt=media&token=02000902-fdfc-41d3-828c-2bc86e4697b9").addOnSuccessListener {
+            Log.d("MyTagHere", "onViewCreated: ")
+        }.addOnFailureListener {
+            Log.d("MyTagHere", "${it.message}")
+        }
+        databaseReference.child("imageUrl").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     val p1Value = dataSnapshot.getValue(String::class.java)
@@ -94,10 +111,12 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Veritabanı işlemi iptal edilirse veya hata oluşursa burada işlemleri yapabilirsiniz
-                Log.e("TAG4", "Veritabanı işlemi iptal edildi veya hata oluştu: " + databaseError.message)
+                Log.e(
+                    "TAG4",
+                    "Veritabanı işlemi iptal edildi veya hata oluştu: " + databaseError.message
+                )
             }
         })
-
 
 
 //        binding = FragmentMainBinding.bind(view)
@@ -123,7 +142,7 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
         // region implements products Recycler view
 
         val productLayoutManager = GridLayoutManager(context, 2)
-        productsAdapter = NBDisplayAdapter(requireContext(), productList, this,this)
+        productsAdapter = NBDisplayAdapter(requireContext(), productList, this, this)
         binding.rvMainProductList.layoutManager = productLayoutManager
         binding.rvMainProductList.adapter = productsAdapter
         setProductsData()
@@ -137,12 +156,14 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
                         .navigate(R.id.action_mainFragment_self)
                     true
                 }
+
                 R.id.likeFragment -> {
 //                    requireActivity().toast("Like Page coming Soon")
                     Navigation.findNavController(requireActivity(), R.id.fragmentContainerView)
                         .navigate(R.id.action_mainFragment_to_likeFragment2)
                     true
                 }
+
                 R.id.cartFragment -> {
 
                     Navigation.findNavController(requireActivity(), R.id.fragmentContainerView)
@@ -150,6 +171,7 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
 
                     true
                 }
+
                 R.id.profileFragment -> {
 
                     auth.signOut()
@@ -157,6 +179,7 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
                         .navigate(R.id.action_mainFragment_to_loginFragment)
                     true
                 }
+
                 else -> false
 
             }
@@ -165,6 +188,7 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
 
 
     }
+
     private fun setCategoryList() {
 
         val valueEvent = object : ValueEventListener {
@@ -197,9 +221,8 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
         databaseReference.addValueEventListener(valueEvent)
 
 
-
-
     }
+
     private fun setProductsData() {
 
         val valueEvent = object : ValueEventListener {
@@ -228,6 +251,7 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
 //        databaseReference.addValueEventListener(valueEvent)
 
     }
+
     override fun onClickCategory(button: Button) {
         binding.tvMainCategories.text = button.text
 
@@ -266,6 +290,7 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
 
 
     }
+
     override fun onClickProduct(item: NBDisplayModel) {
 
         val direction = MainFragmentDirections
@@ -278,10 +303,21 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
 
 
     }
+
     override fun onClickLike(item: NBDisplayModel) {
 
         likeDBRef
-            .add(LikeModel(item.id , auth.currentUser!!.uid , item.brand , item.description , item.imageUrl , item.name ,item.price))
+            .add(
+                LikeModel(
+                    item.id,
+                    auth.currentUser!!.uid,
+                    item.brand,
+                    item.description,
+                    item.imageUrl,
+                    item.name,
+                    item.price
+                )
+            )
             .addOnSuccessListener {
                 requireActivity().toast("Added to Liked Items")
             }
