@@ -2,6 +2,7 @@ package com.example.nbapp
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,15 +14,18 @@ import com.example.nbapp.adapters.CartAdapter
 import com.example.nbapp.databinding.FragmentCartBinding
 import com.example.nbapp.databinding.FragmentLoginBinding
 import com.example.nbapp.models.CartModel
+import com.example.nbapp.models.NBDisplayModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import java.lang.Exception
 
 class CartFragment : Fragment(), CartAdapter.OnLongClickRemove {
 
     private lateinit var binding: FragmentCartBinding
     private lateinit var cartList: ArrayList<CartModel>
+    private lateinit var ordersAdapter: CartAdapter
     private lateinit var auth: FirebaseAuth
     private lateinit var adapter: CartAdapter
     private var subTotalPrice = 0
@@ -40,6 +44,32 @@ class CartFragment : Fragment(), CartAdapter.OnLongClickRemove {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val db = Firebase.firestore
+        val shoppingItemsRef = db.collection("orders")
+
+        shoppingItemsRef.get().addOnSuccessListener { value ->
+            if (value!=null){
+                try {
+                    for (document in value.documents){
+                        val pid = document.get("pid") as String
+                        val uid = document.get("uid") as String
+                        val imageUrl = document.get("imageUrl") as String
+                        val name = document.get("name") as String
+                        val price = document.get("price") as String
+                        val size = document.get("size") as String
+                        val quantity = document.get("quantity") as Int
+                        val orders = CartModel(pid, uid, imageUrl, name, price, size, quantity)
+                        cartList.add(orders)
+                        Log.e("Order", name)
+                    }
+                    ordersAdapter.update(cartList)
+                }catch (e: Exception){
+
+                }
+            }
+
+        }
 
 //        binding = FragmentCartBinding.bind(view)
         auth = FirebaseAuth.getInstance()

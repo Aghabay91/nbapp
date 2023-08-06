@@ -12,7 +12,7 @@ import com.example.nbapp.models.NBDisplayModel
 
 class NBDisplayAdapter(
     private val context: Context,
-    private val list: List<NBDisplayModel>,
+    private var list: List<NBDisplayModel>,
     private val productClickInterface: ProductOnClickInterface,
     private val likeClickInterface: LikeOnClickInterface,
 ):RecyclerView.Adapter<NBDisplayAdapter.ViewHolder>() {
@@ -35,7 +35,7 @@ class NBDisplayAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val currentItem = list[position]
             holder.binding.tvNameNBDisplayItem.text = "${currentItem.brand} ${currentItem.name}"
-            holder.binding.tvPriceNBDisplayItem.text = "₹${currentItem.price}"
+            holder.binding.tvPriceNBDisplayItem.text = "${currentItem.price}"
 
 
             Glide
@@ -60,8 +60,13 @@ class NBDisplayAdapter(
             }
 
         }
-
+    fun update(item:List<NBDisplayModel>){
+        this.list=item
+        notifyDataSetChanged()
+    }
 }
+
+
 
 interface ProductOnClickInterface{
     fun onClickProduct(item: NBDisplayModel)

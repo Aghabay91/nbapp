@@ -42,7 +42,7 @@ class SignupFragment : Fragment(R.layout.fragment_signup) {
                 binding.editTextSignupPassword.text!!.isNotEmpty()
             ) {
 
-                createUser(binding.editTextSignupEmail.text.toString(),binding.editTextSignupName.text.toString())
+                createUser(binding.editTextSignupEmail.text.toString(),binding.editTextSignupPassword.text.toString())
 
             }
         }

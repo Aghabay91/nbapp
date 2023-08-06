@@ -8,10 +8,11 @@ import com.bumptech.glide.Glide
 import com.example.nbapp.SwipeToDelete
 import com.example.nbapp.databinding.CartProductItemBinding
 import com.example.nbapp.models.CartModel
+import com.example.nbapp.models.NBDisplayModel
 
 class CartAdapter(
     private val context: Context,
-    private val list: ArrayList<CartModel>,
+    private var list: ArrayList<CartModel>,
     private val onLongClickRemove: OnLongClickRemove
 ):RecyclerView.Adapter<CartAdapter.ViewHolder>() {
 
@@ -42,7 +43,7 @@ class CartAdapter(
 
 
         holder.binding.tvCartProductName.text = currentItem.name
-        holder.binding.tvCartProductPrice.text = "₹${currentItem.price}"
+        holder.binding.tvCartProductPrice.text = "${currentItem.price}"
         holder.binding.tvCartItemCount.text = currentItem.quantity.toString()
         holder.binding.tvCartProductSize.text = currentItem.size
 
@@ -68,5 +69,9 @@ class CartAdapter(
     }
     interface OnLongClickRemove{
         fun onLongRemove(item: CartModel, position: Int)
+    }
+    fun update(item:List<CartModel>){
+        this.list= item as ArrayList<CartModel>
+        notifyDataSetChanged()
     }
 }

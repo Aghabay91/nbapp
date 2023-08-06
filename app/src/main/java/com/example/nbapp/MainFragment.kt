@@ -9,9 +9,11 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.nbapp.Extensions.toast
 import com.example.nbapp.models.LikeModel
 import com.example.nbapp.models.NBDisplayModel
@@ -20,13 +22,16 @@ import com.example.nbapp.adapters.*
 import com.example.nbapp.databinding.FragmentLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import java.lang.Exception
 
 class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterface,
     LikeOnClickInterface {
 
     private lateinit var binding: FragmentMainBinding
+    private lateinit var fireStoreDatabase: FirebaseFirestore
     private lateinit var databaseReference: DatabaseReference
     private lateinit var productList: ArrayList<NBDisplayModel>
     private lateinit var categoryList: ArrayList<String>
@@ -46,78 +51,32 @@ class MainFragment : Fragment(), CategoryOnClickInterface, ProductOnClickInterfa
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        FirebaseDatabase.getInstance().getReference("products").setValue("MyTest")
-//            .addOnSuccessListener {
-//                Log.d("MyTagHere", "onViewCreated: Success")
-//            }.addOnFailureListener {
-//            Log.d("MyTagHere", "onViewCreated: ${it.message}")
-//        }
-//        FirebaseDatabase.getInstance("https://nbapp-e09bc-default-rtdb.europe-west1.firebasedatabase.app/")
-//            .getReference("products").setValue("").addOnSuccessListener {
-//            Log.d("MyTagHere", "onViewCreated: Success")
-//        }.addOnFailureListener {
-//            Log.d("MyTagHere", "onViewCreated: ${it.message}")
-//        }
-//        val databaseReference = FirebaseDatabase.getInstance().getReference("products")
-//
-//                                                  databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                if (dataSnapshot.exists()) {
-//                    // dataSnapshot içindeki tüm children'ları döngüyle geziyoruz
-//                    for (childSnapshot in dataSnapshot.children) {
-//                        val key = childSnapshot.key // Child düğümünün anahtarı (p1, p2, ...)
-//                        val value = childSnapshot.getValue(String::class.java) // Child düğümünün değeri (p1 düğümündeki değer)
-//
-//                        if (key != null && value != null) {
-//                            // İşlemlerinizi burada gerçekleştirin
-//                            Log.e("TAG", "Anahtar: $key, Değer: $value")
-//                        }
-//                    }
-//                } else {
-//                    // Veritabanında "products" düğümü boşsa veya hiç çocuk düğümü yoksa burada ilgili işlemleri yapabilirsiniz
-//                    Log.e("TAG", "Veritabanında products düğümü boş veya hiç çocuk düğümü yok.")
-//                }
-//            }
-//
-//            override fun onCancelled(databaseError: DatabaseError) {
-//                // Veritabanı işlemi iptal edilirse veya hata oluşursa burada işlemleri yapabilirsiniz
-//                Log.e("TAG3", "Veritabanı işlemi iptal edildi veya hata oluştu: " + databaseError.message)
-//            }
-//        })
 
-        val databaseReference = FirebaseDatabase.getInstance("https://nbapp-e09bc-default-rtdb.europe-west1.firebasedatabase.app/").getReference("products")
-        Log.d("TAG5", "Example")
-        databaseReference.child("imageUrl").setValue("https://firebasestorage.googleapis.com/v0/b/nbapp-e09bc.appspot.com/onb_asus.jpg?alt=media&token=02000902-fdfc-41d3-828c-2bc86e4697b9").addOnSuccessListener {
-            Log.d("MyTagHere", "onViewCreated: ")
-        }.addOnFailureListener {
-            Log.d("MyTagHere", "${it.message}")
-        }
-        databaseReference.child("imageUrl").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    val p1Value = dataSnapshot.getValue(String::class.java)
-                    if (p1Value != null) {
-                        // p1Value değişkeni, p1 düğümündeki dize değeri içerecektir
-                        Log.e("TAG1", "p1 düğümündeki değer: $p1Value")
-                    } else {
-                        // p1 düğümü boşsa veya değeri null ise burada ilgili işlemleri yapabilirsiniz
-                        Log.e("TAG2", "p1 düğümü boş veya değeri null.")
+
+        val db = Firebase.firestore
+        val shoppingItemsRef = db.collection("products")
+
+        shoppingItemsRef.get().addOnSuccessListener { value ->
+            if (value!=null){
+                try {
+                    for (document in value.documents){
+                        val brand = document.get("brand") as String
+                        val name = document.get("name") as String
+                        val id = document.get("id") as? String
+                        val price = document.get("price") as String
+                        val description = document.get("description") as? String
+                        val imageUrl = document.get("imageUrl") as String
+                        val products = NBDisplayModel(brand, description, id, imageUrl, name, price)
+                        productList.add(products)
+                        Log.e("Asus", name)
                     }
-                } else {
-                    // p1 düğümü yoksa burada ilgili işlemleri yapabilirsiniz
-                    Log.e("TAG3", "p1 düğümü yok.")
+                    productsAdapter.update(productList)
+                }catch (e:Exception){
+
                 }
             }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Veritabanı işlemi iptal edilirse veya hata oluşursa burada işlemleri yapabilirsiniz
-                Log.e(
-                    "TAG4",
-                    "Veritabanı işlemi iptal edildi veya hata oluştu: " + databaseError.message
-                )
-            }
-        })
-
+        }
 
 //        binding = FragmentMainBinding.bind(view)
         categoryList = ArrayList()

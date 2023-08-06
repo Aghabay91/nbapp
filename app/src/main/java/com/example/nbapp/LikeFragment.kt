@@ -90,7 +90,7 @@ class LikeFragment : Fragment(), LikedProductOnClickInterface, LikedOnClickInter
 
                 for (item in querySnapshot){
                     likeDBRef.document(item.id).delete()
-                    likedProductList.remove(item.toObject<LikeModel>())
+                    likedProductList.remove(item.toObject())
                     adapter.notifyDataSetChanged()
                     requireActivity().toast("Removed From the Liked Items")
                 }
